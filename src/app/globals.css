@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #F7F4EE;
+  color: #1A1A18;
+}
+
+h1, h2, h3 {
+  font-family: Georgia, serif;
+  font-weight: 400;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #D8D2C4;
+  border-radius: 7px;
+  font-size: 14px;
+  font-family: inherit;
+  background: white;
+  color: #1A1A18;
+  outline: none;
+  box-sizing: border-box;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #1E4D35;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+a { text-decoration: none; color: inherit; }
