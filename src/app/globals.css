@@ -38,3 +38,9 @@ button {
 }
 
 a { text-decoration: none; color: inherit; }
+
+@media print {
+  aside, .no-print { display: none !important; }
+  body { background: white; }
+  main { padding: 0 !important; overflow: visible !important; }
+}

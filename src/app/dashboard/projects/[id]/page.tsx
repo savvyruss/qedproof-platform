@@ -58,6 +58,7 @@ export default async function ProjectPage({ params }: { params: { id: string } }
             <a href={`/dashboard/projects/${params.id}/collect`} style={{ background: '#1E4D35', color: 'white', padding: '9px 18px', borderRadius: 8, fontSize: 14, fontWeight: 500 }}>+ Add feedback</a>
             <a href={`/dashboard/projects/${params.id}/outputs`} style={{ background: 'white', color: '#1A1A18', border: '1px solid #D8D2C4', padding: '9px 18px', borderRadius: 8, fontSize: 14, fontWeight: 500 }}>+ Log output</a>
             <a href={`/dashboard/projects/${params.id}/analyse`} style={{ background: 'white', color: '#1A1A18', border: '1px solid #D8D2C4', padding: '9px 18px', borderRadius: 8, fontSize: 14, fontWeight: 500 }}>Run analysis</a>
+            <a href={`/dashboard/projects/${params.id}/reports`} style={{ background: 'white', color: '#1A1A18', border: '1px solid #D8D2C4', padding: '9px 18px', borderRadius: 8, fontSize: 14, fontWeight: 500 }}>Reports</a>
           </div>
         </div>
       </div>
