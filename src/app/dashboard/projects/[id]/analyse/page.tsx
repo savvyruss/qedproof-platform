@@ -42,9 +42,12 @@ export default function AnalysePage() {
           <label style={{ display: 'block', fontSize: 13, fontWeight: 500, marginBottom: 4 }}>Focus area</label>
           <select value={focus} onChange={e => setFocus(e.target.value)}>
             <option value="general">General social impact</option>
-            <option value="wellbeing">Wellbeing & mental health</option>
-            <option value="skills">Skills & employment</option>
-            <option value="community">Community connection</option>
+            <option value="satisfaction">Satisfaction</option>
+            <option value="safety">Safety</option>
+            <option value="mental_health">Mental health</option>
+            <option value="opportunity">Opportunity</option>
+            <option value="wellbeing">Wellbeing</option>
+            <option value="sustainability">Sustainability</option>
             <option value="barriers">Barriers & challenges</option>
           </select>
         </div>

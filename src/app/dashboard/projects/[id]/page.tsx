@@ -20,6 +20,9 @@ export default async function ProjectPage({ params }: { params: { id: string } }
     .from('analysis_runs').select('*').eq('project_id', params.id)
     .order('created_at', { ascending: false }).limit(1).maybeSingle()
 
+  const { data: outputTotals } = await supabase
+    .from('output_totals').select('*').eq('project_id', params.id)
+
   const allEntries = entries ?? []
   const rated = allEntries.filter((e: any) => e.rating)
   const avgRating = rated.length
@@ -53,6 +56,7 @@ export default async function ProjectPage({ params }: { params: { id: string } }
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <a href={`/dashboard/projects/${params.id}/collect`} style={{ background: '#1E4D35', color: 'white', padding: '9px 18px', borderRadius: 8, fontSize: 14, fontWeight: 500 }}>+ Add feedback</a>
+            <a href={`/dashboard/projects/${params.id}/outputs`} style={{ background: 'white', color: '#1A1A18', border: '1px solid #D8D2C4', padding: '9px 18px', borderRadius: 8, fontSize: 14, fontWeight: 500 }}>+ Log output</a>
             <a href={`/dashboard/projects/${params.id}/analyse`} style={{ background: 'white', color: '#1A1A18', border: '1px solid #D8D2C4', padding: '9px 18px', borderRadius: 8, fontSize: 14, fontWeight: 500 }}>Run analysis</a>
           </div>
         </div>
@@ -116,6 +120,25 @@ export default async function ProjectPage({ params }: { params: { id: string } }
             </div>
           )}
         </div>
+      </div>
+
+      <div style={{ background: 'white', border: '1px solid #D8D2C4', borderRadius: 12, padding: 20, marginBottom: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <h2 style={{ fontSize: 18 }}>Outputs</h2>
+          <a href={`/dashboard/projects/${params.id}/outputs`} style={{ background: '#1E4D35', color: 'white', padding: '6px 12px', borderRadius: 6, fontSize: 13 }}>+ Log</a>
+        </div>
+        {!outputTotals?.length ? (
+          <div style={{ textAlign: 'center', padding: '24px 0', color: '#9A9890', fontSize: 14 }}>Nothing logged yet — e.g. attendees, sessions delivered.</div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 }}>
+            {outputTotals.map((o: any) => (
+              <div key={`${o.metric_name}-${o.unit}`} style={{ padding: '12px 14px', borderRadius: 8, border: '1px solid #D8D2C4' }}>
+                <div style={{ fontSize: 11, color: '#9A9890', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>{o.metric_name}</div>
+                <div style={{ fontSize: 22, fontFamily: 'Georgia, serif' }}>{o.total_value}{o.unit ? ` ${o.unit}` : ''}</div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {latestAnalysis && (

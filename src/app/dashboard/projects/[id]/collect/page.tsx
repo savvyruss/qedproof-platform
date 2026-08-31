@@ -22,7 +22,7 @@ export default function CollectPage() {
     ['stakeholder_input', 'Stakeholder input'],
   ]
 
-  const outcomes = ['Wellbeing', 'Skills & employment', 'Community connection', 'Health', 'Education', 'Financial stability', 'Other']
+  const outcomes = ['Satisfaction', 'Safety', 'Mental health', 'Opportunity', 'Wellbeing', 'Sustainability', 'Other']
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
