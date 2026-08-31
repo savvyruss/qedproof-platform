@@ -1,13 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import toast from 'react-hot-toast'
+
+const DEFAULT_OUTCOMES = ['Satisfaction', 'Safety', 'Mental health', 'Opportunity', 'Wellbeing', 'Sustainability']
 
 export default function CollectPage() {
   const params = useParams()
   const projectId = params.id as string
   const [saving, setSaving] = useState(false)
+  const [outcomes, setOutcomes] = useState<string[]>(DEFAULT_OUTCOMES)
   const [form, setForm] = useState({
     respondent_name: '', feedback_text: '',
     category: 'beneficiary_feedback', outcome_area: '',
@@ -22,7 +25,15 @@ export default function CollectPage() {
     ['stakeholder_input', 'Stakeholder input'],
   ]
 
-  const outcomes = ['Satisfaction', 'Safety', 'Mental health', 'Opportunity', 'Wellbeing', 'Sustainability', 'Other']
+  useEffect(() => {
+    fetch(`/api/outcomes?project_id=${projectId}`)
+      .then(res => res.json())
+      .then(json => {
+        const areas: string[] = Array.from(new Set((json.data ?? []).map((o: any) => o.outcome_area).filter(Boolean)))
+        if (areas.length) setOutcomes(areas)
+      })
+      .catch(() => {})
+  }, [projectId])
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -75,6 +86,7 @@ export default function CollectPage() {
               <select value={form.outcome_area} onChange={e => setForm(f => ({ ...f, outcome_area: e.target.value }))}>
                 <option value="">— select —</option>
                 {outcomes.map(a => <option key={a} value={a}>{a}</option>)}
+                <option value="Other">Other</option>
               </select>
             </div>
           </div>

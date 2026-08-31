@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
+import AddOutcomeForm from '@/components/dashboard/AddOutcomeForm'
 
 export default async function ProjectPage({ params }: { params: { id: string } }) {
   const supabase = await createClient()
@@ -104,7 +105,10 @@ export default async function ProjectPage({ params }: { params: { id: string } }
         </div>
 
         <div style={{ background: 'white', border: '1px solid #D8D2C4', borderRadius: 12, padding: 20 }}>
-          <h2 style={{ fontSize: 18, marginBottom: 16 }}>Outcome framework</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <h2 style={{ fontSize: 18 }}>Outcome framework</h2>
+            <AddOutcomeForm projectId={params.id} />
+          </div>
           {!outcomes?.length ? (
             <div style={{ textAlign: 'center', padding: '24px 0', color: '#9A9890', fontSize: 14 }}>No outcomes defined yet.</div>
           ) : (
