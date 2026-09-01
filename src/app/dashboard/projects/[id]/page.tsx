@@ -94,9 +94,23 @@ export default async function ProjectPage({ params }: { params: { id: string } }
                     <span style={{ background: '#D6EDE2', color: '#1E4D35', padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 600 }}>{catLabels[e.category] ?? e.category}</span>
                     {e.rating && <span style={{ color: '#B8860B', fontSize: 12 }}>{'★'.repeat(e.rating)}</span>}
                   </div>
-                  <p style={{ fontSize: 13, margin: 0, lineHeight: 1.5 }}>
-                    {e.feedback_text.length > 100 ? e.feedback_text.slice(0, 100) + '…' : e.feedback_text}
-                  </p>
+                  {e.responses && Object.keys(e.responses).length > 0 ? (
+                    <div style={{ fontSize: 13, lineHeight: 1.6 }}>
+                      {Object.entries(e.responses).slice(0, 2).map(([q, a]: [string, any]) => (
+                        <div key={q} style={{ marginBottom: 4 }}>
+                          <span style={{ color: '#9A9890' }}>{q}: </span>
+                          <span>{Array.isArray(a) ? a.join(', ') : String(a)}</span>
+                        </div>
+                      ))}
+                      {Object.keys(e.responses).length > 2 && (
+                        <div style={{ color: '#9A9890', fontSize: 12 }}>+ {Object.keys(e.responses).length - 2} more answer(s)</div>
+                      )}
+                    </div>
+                  ) : (
+                    <p style={{ fontSize: 13, margin: 0, lineHeight: 1.5 }}>
+                      {e.feedback_text.length > 100 ? e.feedback_text.slice(0, 100) + '…' : e.feedback_text}
+                    </p>
+                  )}
                   <div style={{ fontSize: 11, color: '#9A9890', marginTop: 4 }}>{e.collected_date}</div>
                 </div>
               ))}
