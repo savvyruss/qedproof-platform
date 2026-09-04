@@ -76,10 +76,11 @@ export async function POST(req: NextRequest) {
   if (!organisation_id) return NextResponse.json({ error: 'organisation_id required' }, { status: 400 })
 
   const { count } = await supabase
-    .from('outcome_questions').select('id', { count: 'exact', head: true }).eq('organisation_id', organisation_id)
+    .from('outcome_questions').select('id', { count: 'exact', head: true })
+    .eq('organisation_id', organisation_id).eq('is_active', true)
 
   if (count && count > 0) {
-    return NextResponse.json({ error: 'This organisation already has an outcome question set — delete existing questions first if you want to reseed.' }, { status: 409 })
+    return NextResponse.json({ error: 'This organisation already has an active outcome question set (v1). Revising it is a separate "new version" step, not a reseed — ask when you\'re ready to make specific changes.' }, { status: 409 })
   }
 
   const rows = QUESTIONS.map((q, i) => ({ ...q, organisation_id, sort_order: i }))

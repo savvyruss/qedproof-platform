@@ -26,8 +26,10 @@ export default async function OrgAdminPage({ params }: { params: { id: string } 
     .eq('organisation_id', params.id)
     .order('created_at', { ascending: false })
 
-  const { count: outcomeQuestionCount } = await supabase
-    .from('outcome_questions').select('id', { count: 'exact', head: true }).eq('organisation_id', params.id)
+  const { data: activeQuestions } = await supabase
+    .from('outcome_questions').select('version').eq('organisation_id', params.id).eq('is_active', true)
+  const outcomeQuestionCount = activeQuestions?.length ?? 0
+  const currentVersion = activeQuestions?.[0]?.version
 
   return (
     <div>
@@ -90,7 +92,7 @@ export default async function OrgAdminPage({ params }: { params: { id: string } 
             <h2 style={{ fontSize: 18, marginBottom: 4 }}>Outcome framework</h2>
             <p style={{ fontSize: 13, color: '#9A9890' }}>
               {outcomeQuestionCount
-                ? `${outcomeQuestionCount} questions configured — used in every project's Outcome check-in.`
+                ? `v${currentVersion} — ${outcomeQuestionCount} questions active — used in every project's Outcome check-in.`
                 : "No outcome questions set up yet for this organisation."}
             </p>
           </div>

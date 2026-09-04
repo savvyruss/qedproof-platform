@@ -16,7 +16,8 @@ export async function GET(req: NextRequest) {
   if (!organisationId) return NextResponse.json({ error: 'organisation_id or project_id required' }, { status: 400 })
 
   const { data, error } = await supabase
-    .from('outcome_questions').select('*').eq('organisation_id', organisationId).order('sort_order')
+    .from('outcome_questions').select('*')
+    .eq('organisation_id', organisationId).eq('is_active', true).order('sort_order')
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ data })
