@@ -83,7 +83,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'This organisation already has an active outcome question set (v1). Revising it is a separate "new version" step, not a reseed — ask when you\'re ready to make specific changes.' }, { status: 409 })
   }
 
-  const rows = QUESTIONS.map((q, i) => ({ ...q, organisation_id, sort_order: i }))
+  // Every row must carry the exact same keys explicitly — Supabase's bulk
+  // insert derives its column list from the union of keys across the whole
+  // batch, so a key present on only some objects (like is_sensitive here,
+  // only set on the self-harm question) gets inserted as NULL for every
+  // other row instead of falling back to its column default.
+  const rows = QUESTIONS.map((q, i) => ({
+    organisation_id,
+    area_code: q.area_code,
+    area_label: q.area_label,
+    question_text: q.question_text,
+    sort_order: i,
+    is_sensitive: q.is_sensitive ?? false,
+    concerning_direction: q.concerning_direction ?? null,
+    concerning_threshold: q.concerning_threshold ?? null,
+  }))
   const { data, error } = await supabase.from('outcome_questions').insert(rows).select()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
