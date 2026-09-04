@@ -24,6 +24,22 @@ export default async function ProjectPage({ params }: { params: { id: string } }
   const { data: outputTotals } = await supabase
     .from('output_totals').select('*').eq('project_id', params.id)
 
+  const { data: questionAverages } = await supabase
+    .from('outcome_question_averages').select('*').eq('project_id', params.id)
+
+  const { count: flaggedCheckins } = await supabase
+    .from('outcome_checkins').select('id', { count: 'exact', head: true })
+    .eq('project_id', params.id).eq('has_flag', true)
+
+  // Weighted average per area (weighted by response_count, not a flat
+  // average of averages, since some questions have far more responses).
+  const areaScores: Record<string, { weightedSum: number; count: number }> = {}
+  ;(questionAverages ?? []).forEach((q: any) => {
+    if (!areaScores[q.area_label]) areaScores[q.area_label] = { weightedSum: 0, count: 0 }
+    areaScores[q.area_label].weightedSum += Number(q.avg_score) * q.response_count
+    areaScores[q.area_label].count += q.response_count
+  })
+
   const allEntries = entries ?? []
   const rated = allEntries.filter((e: any) => e.rating)
   const avgRating = rated.length
@@ -59,6 +75,7 @@ export default async function ProjectPage({ params }: { params: { id: string } }
             <a href={`/dashboard/projects/${params.id}/collect`} style={{ background: '#1E4D35', color: 'white', padding: '9px 18px', borderRadius: 8, fontSize: 14, fontWeight: 500 }}>+ Add feedback</a>
             <a href={`/dashboard/projects/${params.id}/outputs`} style={{ background: 'white', color: '#1A1A18', border: '1px solid #D8D2C4', padding: '9px 18px', borderRadius: 8, fontSize: 14, fontWeight: 500 }}>+ Log output</a>
             <a href={`/dashboard/projects/${params.id}/analyse`} style={{ background: 'white', color: '#1A1A18', border: '1px solid #D8D2C4', padding: '9px 18px', borderRadius: 8, fontSize: 14, fontWeight: 500 }}>Run analysis</a>
+            <a href={`/dashboard/projects/${params.id}/checkin`} style={{ background: 'white', color: '#1A1A18', border: '1px solid #D8D2C4', padding: '9px 18px', borderRadius: 8, fontSize: 14, fontWeight: 500 }}>+ Outcome check-in</a>
             <a href={`/dashboard/projects/${params.id}/reports`} style={{ background: 'white', color: '#1A1A18', border: '1px solid #D8D2C4', padding: '9px 18px', borderRadius: 8, fontSize: 14, fontWeight: 500 }}>Reports</a>
           </div>
         </div>
@@ -154,6 +171,32 @@ export default async function ProjectPage({ params }: { params: { id: string } }
               <div key={`${o.metric_name}-${o.unit}`} style={{ padding: '12px 14px', borderRadius: 8, border: '1px solid #D8D2C4' }}>
                 <div style={{ fontSize: 11, color: '#9A9890', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>{o.metric_name}</div>
                 <div style={{ fontSize: 22, fontFamily: 'Georgia, serif' }}>{o.total_value}{o.unit ? ` ${o.unit}` : ''}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div style={{ background: 'white', border: '1px solid #D8D2C4', borderRadius: 12, padding: 20, marginBottom: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <h2 style={{ fontSize: 18 }}>Outcome scores</h2>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            {!!flaggedCheckins && (
+              <span style={{ background: '#fdecea', color: '#a63d2f', padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600 }}>
+                ⚠️ {flaggedCheckins} flagged check-in{flaggedCheckins === 1 ? '' : 's'}
+              </span>
+            )}
+            <a href={`/dashboard/projects/${params.id}/checkin`} style={{ background: '#1E4D35', color: 'white', padding: '6px 12px', borderRadius: 6, fontSize: 13 }}>+ Check-in</a>
+          </div>
+        </div>
+        {Object.keys(areaScores).length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '24px 0', color: '#9A9890', fontSize: 14 }}>No outcome check-ins recorded yet.</div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 }}>
+            {Object.entries(areaScores).map(([area, { weightedSum, count }]) => (
+              <div key={area} style={{ padding: '12px 14px', borderRadius: 8, border: '1px solid #D8D2C4' }}>
+                <div style={{ fontSize: 11, color: '#9A9890', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>{area}</div>
+                <div style={{ fontSize: 22, fontFamily: 'Georgia, serif' }}>{(weightedSum / count).toFixed(1)}<span style={{ fontSize: 13, color: '#9A9890' }}> /10</span></div>
               </div>
             ))}
           </div>

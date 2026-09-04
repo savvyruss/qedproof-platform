@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import AddMemberForm from '@/components/admin/AddMemberForm'
 import CreateProjectForm from '@/components/admin/CreateProjectForm'
+import SeedOutcomeQuestionsButton from '@/components/admin/SeedOutcomeQuestionsButton'
 
 export default async function OrgAdminPage({ params }: { params: { id: string } }) {
   const supabase = await createClient()
@@ -24,6 +25,9 @@ export default async function OrgAdminPage({ params }: { params: { id: string } 
     .select('*')
     .eq('organisation_id', params.id)
     .order('created_at', { ascending: false })
+
+  const { count: outcomeQuestionCount } = await supabase
+    .from('outcome_questions').select('id', { count: 'exact', head: true }).eq('organisation_id', params.id)
 
   return (
     <div>
@@ -77,6 +81,20 @@ export default async function OrgAdminPage({ params }: { params: { id: string } 
               ))}
             </div>
           )}
+        </div>
+      </div>
+
+      <div style={{ background: 'white', border: '1px solid #D8D2C4', borderRadius: 12, padding: 20 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h2 style={{ fontSize: 18, marginBottom: 4 }}>Outcome framework</h2>
+            <p style={{ fontSize: 13, color: '#9A9890' }}>
+              {outcomeQuestionCount
+                ? `${outcomeQuestionCount} questions configured — used in every project's Outcome check-in.`
+                : "No outcome questions set up yet for this organisation."}
+            </p>
+          </div>
+          {!outcomeQuestionCount && <SeedOutcomeQuestionsButton organisationId={params.id} />}
         </div>
       </div>
     </div>
